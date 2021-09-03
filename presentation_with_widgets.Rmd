@@ -1,0 +1,281 @@
+---
+title: <span style="color:green;font-size:34pt">The Value of Transmission from Pacific Northwest to California</span>
+subtitle: <span style="font-size:20pt">An Analysis Based on CAISO Day Ahead and 15 Minute Market Prices</span>
+author: Elena Stolpovsky
+date: August 25, 2021
+output: 
+  ioslides_presentation: 
+    css: styles.css
+    smaller: true
+---
+
+
+```{r setup, include=F}
+knitr::opts_chunk$set(echo = T,message=FALSE,warning=FALSE,widgetframe_widgetsdir = 'widgets')
+library(visNetwork, quietly = TRUE)
+library(widgetframe)
+```
+
+## Physical Transmission Rights 
+
+A physical transmission right (PTR) gives the holder the exclusive right to use a particular interconnection *in one direction* to transfer a *predefined quantity of energy* *from one market hub to the other*.
+
+- Market Hubs: Mid-Columbia (MIDC) and North of Path 15 (NP15)
+- Direction: North to South
+- Quantity: 1 MW (can be rescaled for a different transmission capacity)
+
+Who needs to understand the value of PTR:
+
+- Utilities in the PNW or generation owners that use the PNW-California path
+- Owners of PTRs (e.g. BPA) that need to price PTR contracts
+- Regulators considering building new transmission
+
+## Value from Owning Transmission
+
+Opportunity for arbitrage between the market hubs.
+
+Arbitrage can occur in different markets:
+
+- Long-term forward market (typically peak and off-peak prices)
+- Day-ahead market (hourly prices)
+- Real time market
+
+  - 15-minute market
+  - 5-minute market
+
+
+Data:
+
+- Source: CAISO OASIS day ahead and 15-min market prices at MIDC (PGE share) and NP15
+- Period: August 1 2019 midnight - July 31 2021 11am.
+- Frequency: hourly for day ahead data, by 15 minutes for 15-min market data
+
+
+<!--  
+### Value of Physical Transmission Rights  
+
+A PTR gives the holder the **option** to transfer energy from one market hub to another.
+
+A purchase of a PTR is analogous to a purchase of an option:
+  - Upfront cost
+  - opportunity for nonnegative payoffs in the future
+
+
+## Loading the CAISO OASIS Data
+
+CAISO OASIS website allows to download at most 1 month of price data
+
+
+```{r, eval=FALSE}
+file_list <- paste(path, list.files(path), sep = "") 
+#list of files with monthly prices
+
+fmm <- data.frame()
+for (i in 1:length(file_list)) {
+  temp <-
+    fread(file_list[i]) #read in files
+  fmm <-
+    rbindlist(list(fmm, temp), use.names = T) #for each iteration, 
+  #bind the new data to the building dataset
+}
+```
+-->
+
+<!--
+
+## CAISO Day-Ahead Market
+
+- The utility is able to commit resources and execute bilateral trades in the day ahead. 
+  - More certainty that it will be able to advantage of the price spread
+- This provides a lower bound  
+-->
+
+## Day-Ahead Prices at MIDC and NP15, August 2019
+
+<iframe src="damprices.html"></iframe>
+
+<!--
+## Summary of Day-Ahead Prices 
+
+<iframe src="damsummary.html"></iframe>
+-->
+
+## Day Ahead Market Price Sread: Price at NP15 - Price at MIDC
+
+<iframe src="damspread.html"></iframe>
+
+## 15-Min Market Pices at MIDC and NP15, August 2019
+
+<iframe src="fmmprices.html"></iframe>
+
+## 15-Min Market Price Sread: Price at NP15 - Price at MIDC
+
+<iframe src="fmmspread.html"></iframe>
+
+## DAM and FMM Prices and Spreads Between NP15 and MIDC, August 2019 - August 2021
+
+<iframe src="allmarketsummary.html"></iframe>
+
+## Nonnegative DAM and FMM Price Spreads
+
+Nonnegative price spreads between NP15 and MIDC represent the value of the option to transmit energy south between these hubs.
+
+The value of 1 MW of PTR from MIDC to NP15 in a given hour =  (nonnegative price spread per hour in $/MWh)*1 MW, adjusted for transmission losses.
+
+<!--Transforming 15-Minute Nonnegative Spreads into Hourly Values-->
+I average 15-minute nonnegative spreads by hour to obtain **hourly nonnegative price spreads** in the FMM.
+
+<!--
+```{r, eval=F}
+#Averaging 15-min nonnegative price spreads into hourly nonnegative price spreads
+fmmhourly <-
+  fmmpivot %>% mutate(hourlystart = strptime(start, format = "%Y-%m-%d %H")) %>%
+  group_by(hourlystart) %>% summarize(nonnegative_spread =
+                            mean(nonnegative_spread)) 
+```
+-->
+<iframe src="fmmhourlysummary.html"></iframe>
+
+## Nonnegative Price Spreads in DAM and FMM in August 2019
+
+<iframe src="dam_rtm_nonnegative_spreads.html"></iframe>
+
+
+## Seasonality of Nonnegative Spreads in the DAM and FMM
+
+- High hourly Seasonality in the DAM and FMM
+  - Morning and evening peaks are sharper in California than in the Pacific Northwest.
+- No weekly seasonality
+  - The day of the week does not appear to affect price spreads
+- Possible monthly seasonality
+  - 15-min market spreads were highest in July
+
+## Nonnegative Price Spreads by Hour of the Day
+
+<iframe src="hourly_shape_of_spreads.html"></iframe>
+
+## Nonnegative Price Spreads by Day of the Week
+
+<iframe src="weekday_shape_of_spreads.html"></iframe>
+
+## Nonnegative Price Spreads by Month of the Year
+
+<iframe src="monthly_shape of _spreads.html"></iframe>
+
+## Valuation Based on the NPV of Payoffs
+
+Model assumptions and inputs:
+
+- Transmission can always be utilized at full capacity
+- Transmission losses = 5% ([eia.gov](https://www.eia.gov/tools/faqs/faq.php?id=105&t=3]))
+- Yearly discount rate = 10% (based on the company's cost of capital)
+
+$NPV= \sum_{t=0}^{n}\frac{R_t}{(1+i)^t}$
+
+$t$: hours
+
+hourly payoffs: $R_t =$ nonnegative hourly price spread * $0.95$ 
+
+monthly discounting: $i=10\%/12$
+
+The NPV (as of August 1 2019) of utilizing 1 MW of transmission from PNW to CA for 2 years in the **DAM** is **$23,000**.
+
+The NPV of utilizing 1 MW of transmission for 2 years in the **FMM** is **$177,000**.
+
+## 10 Year Valuation
+
+PTR contracts may be long-term.
+
+I create a "naive" forecast of nonnegative price spreads in the day ahead and real time markets for 2021 - 2029:
+  price spreads for every 2 year forecast period until July 2029 = price spreads in 2019 - 2021
+  
+```{r, eval=F}
+naive_forecast_until_aug1_2029 <-rep(fmmhourly$nonnegative_spread, times = 5)
+```
+
+
+The NPV (as of August 1 2019) of utilizing 1 MW of transmission from PNW to CA for 10 years in the **DAM** is **$80,000**.
+
+The NPV of utilizing 1 MW of transmission for 10 years in the **FMM** is **$609,000**.
+
+The 15-min market brings **7.6 times** more arbitrage value from the difference in MIDC and Northern CA prices.
+
+
+## Quantifying Uncertainty 
+
+Can model 2 price series separately or model the spread directly.
+
+  - If modeling 2 price series, need to preserve the correlation between the two price points 
+  
+Price spreads exhibit characteristics similar to other energy price series:
+
+- Mean reverting (models like exponential smoothing)
+- Frequent spikes or jumps
+- High volatility, or fat tails
+
+  
+To quantify uncertainty
+
+- use the model to generate N (e.g. 1000) simulations of the series for the valuation period
+- calculate N NPVs
+- Obtain summary statistics from the distribution of NPVs: mean, standard errors, and percentiles.
+
+
+ 
+
+## Quantifying Uncertainty. A Bootstrap Approach.
+
+Simulate nonnegative price spreads in a given hour of the day by sampling from historical data for this hour. 
+
+If N is the number of simulations needed,
+Y is the number of years of data to be simulated:
+
+- Generate a sample of hour 0 data:
+  - Take a sample with replacement of size $N*Y*$(number of hours in a year) from hour 0 historical data. 
+
+```{r, eval=F}
+sample(hour0, size = N*Y*8765, replace = TRUE)
+```
+- Samples of hour 1 to hour 23 data are generated in the same way.
+- Transform the samples into N simulations of hourly data for Y years.
+- For each simulation, calculate the NPV.
+- Obtain summary statistics from the distribution of NPVs.
+
+
+
+
+
+## Discussion
+
+Other Sources of Value from PTRs:
+
+- Sale of Renewable Energy Credits
+- Reduction of curtailment of wind and solar energy.
+  - Increase the value of renewable energy projects and promote their development
+
+Considerations:
+
+- Can the utilities always take full advantage of price spreads in the 15-minute market?
+- How does the participation in the 5-minute market affect the value of transmission?
+  - I expect greater option value, but lower market volume and greater volatility.
+  
+# Questions?
+
+## Loading the CAISO OASIS Data
+
+CAISO OASIS website allows to download at most 1 month of price data
+
+
+```{r, eval=FALSE}
+file_list <- paste(path, list.files(path), sep = "") 
+#list of files with monthly prices
+
+fmm <- data.frame()
+for (i in 1:length(file_list)) {
+  temp <-
+    fread(file_list[i]) #read in files
+  fmm <-
+    rbindlist(list(fmm, temp), use.names = T) #for each iteration, 
+  #bind the new data to the building dataset
+}
+```

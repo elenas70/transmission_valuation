@@ -1,7 +1,7 @@
 ---
 title: <span style="color:green;font-size:34pt">The Value of Transmission from Pacific Northwest to California</span>
-subtitle: <span style="font-size:20pt">An Analysis Based on CAISO Day Ahead and 15 Minute Market Prices</span>
-author: Elena Stolpovsky, PhD
+subtitle: <span style="font-size:20pt">An Analysis Based on CAISO Day Ahead and 15 Minute Market Prices.</span> <br /> <span style="font-size:15pt">[Project repository](https://github.com/elenas70/transmission_valuation)</span>   
+author: "[Elena Stolpovsky, PhD](https://www.linkedin.com/in/estolpovsky/)"
 date: August 25, 2021
 output: 
   ioslides_presentation: 
@@ -14,11 +14,11 @@ output:
 knitr::opts_chunk$set(
   echo = T,
   message = FALSE,
-  warning = FALSE,
-  widgetframe_widgetsdir = 'widgets'
+  warning = FALSE
+  #widgetframe_widgetsdir = 'widgets'
 )
 library(visNetwork, quietly = TRUE)
-library(widgetframe)
+#library(widgetframe)
 options(scipen = 999,  digits = 2)
 Sys.setenv(TZ = 'GMT')
 ```
@@ -29,7 +29,7 @@ A physical transmission right (PTR) gives the holder the exclusive right to use 
 
 - Market Hubs: Mid-Columbia (MIDC) and North of Path 15 (NP15)
 - Direction: North to South
-- Quantity: 1 MW (can rescaled for a different transmission capacity)
+- Quantity: 1 MW (can be resealed for a different transmission capacity)
 
 Who needs to understand the value of PTR:
 
@@ -87,7 +87,7 @@ library(data.table)
 library(tidyverse)
 library(htmlwidgets)
 library(DT)
-path = "C:/elena/caiso_prices/analysis/data/DAM/"
+path = "C:/elena/transmission_valuation/data/DAM/"
 file_list <- paste(path, list.files(path), sep = "")
 
 dam <- data.frame()
@@ -125,9 +125,14 @@ dam <-
                                                                                                                              node == 'MIDC_5_PGESHARE-APND' ~ 'midc',
                                                                                                                              node == 'TH_NP15_GEN-APND' ~ 'np15'
                                                                                                                            )) %>% arrange(start) %>% mutate(start = start - 7 * 60 * 60, end = end -
-                                                                                                                                                              7 * 60 * 60) %>% # correct for the fact that Pacific time was read as GMT
-  filter(start < "2021-08-01 UTC")
-#choose 2 years of data exactly
+                                                                                                                                                              7 * 60 * 60)  # correct for the fact that Pacific time was read as GMT
+
+#save(dam, file="dam.RData") #save joined dam data for the shiny app
+
+dam <-
+  dam %>% filter(start < "2021-08-01 UTC") #choose 2 years of data exactly
+
+
 
 library(plotly)
 dam10days <- dam %>% filter(start < "2019-08-10 07:00:00 UTC")
@@ -139,10 +144,11 @@ p <-
 ggplotly(p, height = 400, width = 700)
 
 ```
-<span style="font-size:10pt">*Source:* [CAISO OASIS](http://oasis.caiso.com/mrioasis/logon.do), 08/2019</span>
+<span style="font-size:10pt">[View Prices for 2019 - 2021](https://elenast.shinyapps.io/time_selection/) <br> 
+*Source:* [CAISO OASIS](http://oasis.caiso.com/mrioasis/logon.do), 08/2019  </span>
 
 
-## Day Ahead Market Price Sread: Price at NP15 - Price at MIDC
+## Day Ahead Market Price Spread: Price at NP15 - Price at MIDC
 
 ```{r, echo=F}
 dampivot <-
@@ -183,7 +189,7 @@ ggplotly(p, height = 400, width = 700)
 ## 15-Min Market Pices at MIDC and NP15
 
 ```{r, echo=F}
-path = "C:/elena/caiso_prices/analysis/data/FMM/"
+path = "C:/elena/transmission_valuation/data/FMM/"
 file_list <- paste(path, list.files(path), sep = "")
 
 fmm <- data.frame()
@@ -221,8 +227,11 @@ fmm <-
                                                                                                                              node == 'MIDC_5_PGESHARE-APND' ~ 'midc',
                                                                                                                              node == 'TH_NP15_GEN-APND' ~ 'np15'
                                                                                                                            )) %>% filter(node %in% c('midc', 'np15')) %>% mutate(start = start - 7 *
-                                                                                                                                                                                   60 * 60, end = end - 7 * 60 * 60) %>% # correct for the fact that Pacific time was read as GMT <-
-  filter(start < "2021-08-01 UTC") %>% arrange(start)
+                                                                                                                                                                                   60 * 60, end = end - 7 * 60 * 60)# correct for the fact that Pacific time was read as GMT
+
+#save(fmm, file="fmm.RData") #save joined fmmdata for the shiny app
+
+fmm <- fmm %>% filter(start < "2021-08-01 UTC") %>% arrange(start)
 
 fmm10days <- fmm %>% filter(start < "2019-08-10 07:00:00 UTC")
 
@@ -232,10 +241,10 @@ p <-
 ggplotly(p, height = 400, width = 700)
 
 ```
-<span style="font-size:10pt">*Source:* [CAISO OASIS](http://oasis.caiso.com/mrioasis/logon.do), 08/2019 </span>
+<span style="font-size:10pt">[View Prices for 2019 - 2021](https://elenast.shinyapps.io/time_selection/) <br> *Source:* [CAISO OASIS](http://oasis.caiso.com/mrioasis/logon.do), 08/2019 </span>
 
 
-## 15-Min Market Price Sread: Price at NP15 - Price at MIDC
+## 15-Min Market Price Spread: Price at NP15 - Price at MIDC
 
 ```{r, echo=F, results = FALSE}
 fmmpivot <-

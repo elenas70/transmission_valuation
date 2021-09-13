@@ -144,8 +144,7 @@ p <-
 ggplotly(p, height = 400, width = 700)
 
 ```
-<span style="font-size:10pt">[View Prices for 2019 - 2021](https://elenast.shinyapps.io/time_selection/) <br> 
-*Source:* [CAISO OASIS](http://oasis.caiso.com/mrioasis/logon.do), 08/2019  </span>
+<span style="font-size:10pt">[View Prices and Spreads for 2019 - 2021](https://elenast.shinyapps.io/dam_and_fmm_prices_dashboard/) <br> *Source:* [CAISO OASIS](http://oasis.caiso.com/mrioasis/logon.do) </span>
 
 
 ## Day Ahead Market Price Spread: Price at NP15 - Price at MIDC
@@ -154,6 +153,8 @@ ggplotly(p, height = 400, width = 700)
 dampivot <-
   dam %>% pivot_wider(names_from = node, values_from = price) %>% mutate(spread =
                                                                            np15 - midc) %>% mutate(nonnegative_spread = (spread > 0) * spread)
+
+#save(dampivot, file="dampivot.RData") #save joined dampivot with spreads
 
 min <- dampivot %>% select(midc, np15, spread, nonnegative_spread) %>%
   summarise_all( ~ min(.))
@@ -184,7 +185,7 @@ p <-
 ggplotly(p, height = 400, width = 700)
 
 ```
-<span style="font-size:10pt">*Source:* [CAISO OASIS](http://oasis.caiso.com/mrioasis/logon.do), 08/2019</span>
+<span style="font-size:10pt">[View Prices and Spreads for 2019 - 2021](https://elenast.shinyapps.io/dam_and_fmm_prices_dashboard/) <br> *Source:* [CAISO OASIS](http://oasis.caiso.com/mrioasis/logon.do) </span>
 
 ## 15-Min Market Pices at MIDC and NP15
 
@@ -241,15 +242,16 @@ p <-
 ggplotly(p, height = 400, width = 700)
 
 ```
-<span style="font-size:10pt">[View Prices for 2019 - 2021](https://elenast.shinyapps.io/time_selection/) <br> *Source:* [CAISO OASIS](http://oasis.caiso.com/mrioasis/logon.do), 08/2019 </span>
-
+<span style="font-size:10pt">[View Prices and Spreads for 2019 - 2021](https://elenast.shinyapps.io/dam_and_fmm_prices_dashboard/) <br> *Source:* [CAISO OASIS](http://oasis.caiso.com/mrioasis/logon.do) </span>
 
 ## 15-Min Market Price Spread: Price at NP15 - Price at MIDC
 
-```{r, echo=F, results = FALSE}
+```{r, echo=F}
 fmmpivot <-
   fmm %>% pivot_wider(names_from = node, values_from = price) %>% mutate(spread =
                                                                            np15 - midc) %>% mutate(nonnegative_spread = (spread > 0) * spread)
+
+#save(fmmpivot, file="fmmpivot.RData") #save fmm pivot data for the shiny app
 
 min <- fmmpivot %>% select(midc, np15, spread, nonnegative_spread) %>%
   summarise_all( ~ min(.))
@@ -275,9 +277,11 @@ rownames(fmmsum) <-
 fmmtab <- datatable(fmmsum, options = list(dom = 't'), width = .7)
 
 allmarketsum <- rbind(damsum, fmmsum)
+```
+
+```{r, results=F, echo=F}
 setDT(allmarketsum, keep.rownames = TRUE)[]
 names(allmarketsum)[1] <- 'Series'
-
 ```
 
 
@@ -297,9 +301,7 @@ ggplotly(p, height = 400, width = 700)
 ## DAM and FMM Prices and Spreads Between NP15 and MIDC, 2019 - 2021
 
 ```{r, echo=F}
-allmarkettab <-
-  datatable(allmarketsum, options = list(dom = 't'), width = .5) %>% formatStyle('Series', "white-space" =                                                                                   "nowrap")
-allmarkettab
+datatable(allmarketsum, options = list(dom = 't')) %>% formatStyle('Series', "white-space" = "nowrap")
 ```
 <span style="font-size:10pt">*Source:* [CAISO OASIS](http://oasis.caiso.com/mrioasis/logon.do), 08/2019 - 07/2021</span>
 
@@ -331,9 +333,8 @@ sum <-
 names(sum) = c('Min', 'Mean', 'Max', 'St.Dev')
 rownames(sum) <- 'FMM Hourly Nonnegative Spread'
 
-fmmhourlytab <- datatable(sum, options = list(dom = 't'), width = .2)
+datatable(sum, options = list(dom = 't'))
 
-fmmhourlytab
 ```
 
 <span style="font-size:10pt">*Source:* [CAISO OASIS](http://oasis.caiso.com/mrioasis/logon.do), 08/2019 - 07/2021</span>
@@ -356,7 +357,7 @@ p <-
 ggplotly(p, height = 400, width = 700)
 
 ```
-<span style="font-size:10pt">*Source:* [CAISO OASIS](http://oasis.caiso.com/mrioasis/logon.do), 08/2019</span>
+<span style="font-size:10pt">[View Prices and Spreads for 2019 - 2021](https://elenast.shinyapps.io/dam_and_fmm_prices_dashboard/) <br> *Source:* [CAISO OASIS](http://oasis.caiso.com/mrioasis/logon.do) </span>
 
 ## Seasonality of Nonnegative Spreads in the DAM and FMM
 
